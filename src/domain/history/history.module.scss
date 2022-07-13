@@ -1,0 +1,14 @@
+.main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.item {
+  width: 80px;
+  border: 1px solid #aaa;
+  padding: 5px 20px;
+  margin: 5px;
+  border-radius: 12px;
+  background-color: #fafafa;
+}
