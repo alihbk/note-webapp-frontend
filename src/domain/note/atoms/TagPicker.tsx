@@ -1,15 +1,14 @@
-import { Tags } from "../../../utility/const";
 import ColorLensIcon from "@mui/icons-material/ColorLens";
-import { Typography } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
-import React from "react";
+import React, { useState } from "react";
+import { Tags } from "../../../utility/const";
+import TagItem from "./tagItem";
 
 type Props = { onSelect: Function };
 
 const TagPicker = (props: Props) => {
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const open = Boolean(anchorEl);
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -78,31 +77,13 @@ const TagPicker = (props: Props) => {
             padding: 0,
           }}
         >
-          {Tags.map((item, index) => (
-            <MenuItem
+          {Tags.map((tag, index) => (
+            <TagItem
               onClick={() => {
-                props.onSelect(item);
+                props.onSelect(tag);
               }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  backgroundColor: "#fff",
-                }}
-              >
-                <div
-                  style={{
-                    width: 30,
-                    height: 30,
-                    backgroundColor: item.color,
-                    borderRadius: 8,
-                  }}
-                ></div>
-                &nbsp;
-                <Typography> {item.name}</Typography>
-              </div>
-            </MenuItem>
+              item={tag}
+            />
           ))}
         </div>
       </Menu>

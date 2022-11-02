@@ -6,8 +6,13 @@ class noteService {
     return result;
   }
 
-  async get() {
-    let result: any = await axiosContext().get(`${"/api/note"}`);
+  async get(filter: any) {
+    let result: any = await axiosContext().get(`${"/api/note?"}${filter}`);
+    return result;
+  }
+
+  async delete(id: any) {
+    let result: any = await axiosContext().delete(`${"/api/note"}/${id}`);
     return result;
   }
 }

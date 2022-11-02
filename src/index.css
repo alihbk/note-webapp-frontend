@@ -5,6 +5,7 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: #eee;
 }
 ul {
   list-style-type: none;
@@ -29,4 +30,3 @@ li a {
 li a:hover {
   background-color: #111;
 }
-
