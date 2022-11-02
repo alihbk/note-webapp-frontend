@@ -1,4 +1,4 @@
-import Home from "../domain/home/home";
+ import NotePage from "../domain/note/notePage";
 import Layout from "../layout/layout";
 
 type Props = {};
@@ -6,7 +6,8 @@ type Props = {};
 const HomePage = (props: Props) => {
   return (
     <Layout>
-      <Home />
+      <NotePage/>
+      {/* <Home /> */}
     </Layout>
   );
 };

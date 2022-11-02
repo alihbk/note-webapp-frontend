@@ -3,6 +3,8 @@ import { useParams } from "react-router-dom";
 import { SearchBar } from "../../components/searchBar/searchBar";
 import UserCard from "../../components/userCard/userCard";
 import styles from "./home.module.scss";
+import Button from '@mui/material/Button';
+
 type Props = {};
 
 const Home = (props: Props) => {
@@ -23,7 +25,7 @@ const Home = (props: Props) => {
           setUsername(e);
         }}
       />
-
+ <Button variant="contained">Hello World</Button>
       {username && <UserCard username={username} />}
     </div>
   );
