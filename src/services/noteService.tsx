@@ -1,12 +1,17 @@
 import { axiosContext } from "../config/axiosContext";
 
 class noteService {
-  async createNote(data: any) {
+  async post(data: any) {
     let result: any = await axiosContext().post(`${"/api/note"}`, data);
     return result;
   }
 
-  async get(filter: any) {
+  async patch(data: any, id: any) {
+    let result: any = await axiosContext().patch(`${"/api/note"}/${id}`, data);
+    return result;
+  }
+
+  async get(filter: string) {
     let result: any = await axiosContext().get(`${"/api/note?"}${filter}`);
     return result;
   }

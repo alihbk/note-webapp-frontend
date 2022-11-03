@@ -7,7 +7,6 @@ import { useState } from "react";
 import { Tags } from "../../../utility/const";
 import TagPicker from "../atoms/tagPicker";
 type Props = {
-  id?: any;
   title?: string;
   body?: string;
   tag?: any;
@@ -93,9 +92,13 @@ const NoteItem = (props: Props) => {
             }}
           />
           <IconButton
-            onClick={() =>
-              props.onCreate && props.onCreate({ title, body, tag: tag })
-            }
+            onClick={() => {
+              if (props.isNew) {
+                props.onCreate && props.onCreate({ title, body, tag: tag });
+              } else {
+                props.onUpdate && props.onUpdate({ title, body, tag: tag });
+              }
+            }}
           >
             <SaveIcon />
           </IconButton>

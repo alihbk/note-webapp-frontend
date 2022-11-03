@@ -1,7 +1,9 @@
 import { Box } from "@mui/material";
+import MuiAlert, { AlertProps } from "@mui/material/Alert";
 import CircularProgress from "@mui/material/CircularProgress";
+import Snackbar from "@mui/material/Snackbar";
 import Query from "query-string";
-import { useState, useEffect } from "react";
+import { forwardRef, useEffect, useState } from "react";
 import noteService from "../../../services/noteService";
 import TagFilter from "../atoms/tagFilter";
 import NoteItem from "../molecules/noteItem";
@@ -10,31 +12,126 @@ type Props = {};
 
 const NotePage = (props: Props) => {
   const [data, setData] = useState([]);
-  const [showLoading, setShowLoading] = useState(false);
-  const [shouldUpdate, setShouldUpdate] = useState(false);
+  const [showLoading, setShowLoading] = useState<boolean>(false);
+  const [filter, setFilter] = useState<any>(null);
+
   useEffect(() => {
     (async () => {
-      await getData(null);
+      await getData();
     })();
-  }, []);
+  }, [filter]);
 
-  useEffect(() => {}, [shouldUpdate]);
-
-  const deleteNote = async (id: any) => {
-    await noteService.delete(id);
-    await getData(null);
-  };
-
-  const getData = async (filter: any) => {
-    let result = await noteService.get(Query.stringify(filter));
-
-    setData(result.data);
-  };
+  useEffect(() => {}, [data]);
 
   const createNote = async (e: any) => {
-    await noteService.createNote(e);
-    await getData(null);
+    try {
+      setShowLoading(true);
+      let result = await noteService.post(e);
+      if (result.status === 201) {
+        await getData();
+        handleSetAlert("success", "record was created successfully");
+      }
+    } catch (e) {
+      handleSetAlert("error", e.message);
+    } finally {
+      setShowLoading(false);
+    }
   };
+
+  const updateNote = async (e: any, id: any) => {
+    try {
+      setShowLoading(true);
+      let result = await noteService.patch(e, id);
+      if (result.status === 200) {
+        await getData();
+        handleSetAlert("success", "record was updated successfully");
+      }
+    } catch (e) {
+      handleSetAlert("error", e.message);
+    } finally {
+      setShowLoading(false);
+    }
+  };
+
+  const deleteNote = async (id: any) => {
+    try {
+      setShowLoading(true);
+      let result = await noteService.delete(id);
+      if (result.status === 204) {
+        await getData();
+        handleSetAlert("success", "record was deleted successfully");
+      }
+    } catch (e) {
+      handleSetAlert("error", e.message);
+    } finally {
+      setShowLoading(false);
+    }
+  };
+
+  const getData = async () => {
+    try {
+      setShowLoading(true);
+      let result = await noteService.get(Query.stringify(filter));
+      if (result.status === 200) {
+        setData(result.data);
+      }
+    } catch (e) {
+      handleSetAlert("error", e.message);
+    } finally {
+      setShowLoading(false);
+    }
+  };
+
+  // #region alert
+  const [openAlert, setOpenAlert] = useState(false);
+
+  interface IError {
+    type: any;
+    message: string;
+  }
+  const [error, setError] = useState<IError>({ type: "", message: "" });
+
+  const Alert = forwardRef<HTMLDivElement, AlertProps>(function Alert(
+    props,
+    ref
+  ) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+  });
+
+  const handleSetAlert = (type: string, message: string) => {
+    setError({ type: type, message: message });
+    setOpenAlert(true);
+  };
+
+  const handleCloseAlert = (
+    event: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setOpenAlert(false);
+  };
+
+  let renderAlert = () => {
+    return (
+      <Snackbar
+        open={openAlert}
+        autoHideDuration={3000}
+        onClose={handleCloseAlert}
+      >
+        <Alert
+          onClose={handleCloseAlert}
+          severity={error.type}
+          sx={{ width: "100%" }}
+        >
+          {error.message}
+        </Alert>
+      </Snackbar>
+    );
+  };
+  // #endregion
 
   if (showLoading) {
     return (
@@ -46,22 +143,22 @@ const NotePage = (props: Props) => {
 
   return (
     <div style={{ backgroundColor: "#eee", height: "100%" }}>
+      {renderAlert()}
       <TagFilter
         onSelect={async (e: any) => {
           var q: any = {};
           if (e.name !== "All") {
             q.tag = e.name;
           }
-          await getData(q);
-          setShouldUpdate(!shouldUpdate);
+          setFilter(q);
         }}
       />
+
       <div style={{ display: "flex", justifyContent: "center" }}>
         <NoteItem
           isNew={true}
           onCreate={async (e: any) => {
             await createNote(e);
-            setShouldUpdate(!shouldUpdate);
           }}
         />
       </div>
@@ -82,9 +179,11 @@ const NotePage = (props: Props) => {
               title={x.title}
               body={x.body}
               tag={x.tag}
-              id={x._id}
               onDelete={async () => {
                 await deleteNote(x._id);
+              }}
+              onUpdate={async (e: any) => {
+                await updateNote(e, x._id);
               }}
               isNew={false}
             />
